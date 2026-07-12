@@ -42,7 +42,7 @@ In order to properly install the game, you'll have to follow these steps precise
 - Install `libshacccg.suprx`, if you don't have it already, by following [this guide](https://samilops2.gitbook.io/vita-troubleshooting-guide/shader-compiler/extract-libshacccg.suprx).
 - Obtain your copy of *After Burner Climax* legally for Android in form of an `.apk` file and an obb. [You can get all the required files directly from your phone](https://stackoverflow.com/questions/11012976/how-do-i-get-the-apk-of-an-installed-app-without-root-access) or by using an apk extractor you can find in the play store.
 - Open the apk with your zip explorer and extract the file `libacb.so` from the `lib/armeabi-v7a` folder to `ux0:data/afterburner`.
-- *(Optional)* In order to have the intro logo to play, extract the file `sega_720.mp` from the `res/raw` folder to `ux0:data/afterburner`.
+- *(Optional)* In order to have the intro logo to play, extract the file `sega_720.mp4` from the `res/raw` folder to `ux0:data/afterburner`.
 - Put the obb file named as `main.obb` in `ux0:data/afterburner`.
 - Extract `libfmodstudio.suprx` from PCSE01188 or PCSE01426 following [this guide](https://gist.github.com/hatoving/99253e1b3efdefeaf0ca66e0c5dc7089).
 - Extract the zip file in the Release tab in `ux0:data`.
