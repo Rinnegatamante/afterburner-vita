@@ -1,10 +1,11 @@
 /*
- * utils/controls.cpp
+ * shim/fndk_controls.cpp
  *
  * Copyright (C) 2023 Volodymyr Atamanenko
+ * Copyright (C) 2026 Ellie J Turner
  *
- * This software may be modified and distributed under the terms
- * of the MIT license. See the LICENSE file for details.
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
  */
 
 #include "shim/fndk_controls.h"
@@ -20,6 +21,7 @@
 extern "C" {
     float L_INNER_DEADZONE __attribute__((weak)) = 0.20f;
     float R_INNER_DEADZONE __attribute__((weak)) = 0.20f;
+    int fndk_button_event_source __attribute__((weak)) = AINPUT_SOURCE_GAMEPAD;
 }
 
 #define L_OUTER_DEADZONE 0.99f
@@ -309,7 +311,7 @@ void pollPad() {
         ButtonMapping & m = fndk_button_mapping[i];
         if (pressed_buttons & m.sce_button) {
             inputEvent e;
-            e.source = AINPUT_SOURCE_GAMEPAD; // Warning: some games may want distinction between AINPUT_SOURCE_KEYBOARD and AINPUT_SOURCE_DPAD
+            e.source = fndk_button_event_source; // Override fndk_button_event_source to change, e.g. to AINPUT_SOURCE_DPAD
             e.keycode = m.android_button;
             e.action = AKEY_EVENT_ACTION_DOWN;
             e.type = AINPUT_EVENT_TYPE_KEY;
@@ -318,7 +320,7 @@ void pollPad() {
             AInputQueue_enqueueEvent(inputQueue, aie);
         } else if (released_buttons & m.sce_button) {
             inputEvent e;
-            e.source = AINPUT_SOURCE_GAMEPAD; // Warning: some games may want distinction between AINPUT_SOURCE_KEYBOARD and AINPUT_SOURCE_DPAD
+            e.source = fndk_button_event_source;
             e.keycode = m.android_button;
             e.action = AKEY_EVENT_ACTION_UP;
             e.type = AINPUT_EVENT_TYPE_KEY;

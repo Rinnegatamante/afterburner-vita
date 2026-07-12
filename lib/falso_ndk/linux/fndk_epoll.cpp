@@ -315,7 +315,7 @@ int fndk_epoll_wait(int epfd, struct fndk_epoll_event *events, int maxevents, in
         }
 
         _unlock();
-        usleep(4167); // give a chance for other threads to add new FDs to pool / 1/4 of a frame at 60fps
+        fndk_eventfd_wait_for_activity(4167);
         _lock();
     }
 

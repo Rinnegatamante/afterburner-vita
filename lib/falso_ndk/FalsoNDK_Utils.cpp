@@ -1,3 +1,13 @@
+/*
+ * FalsoNDK_Utils.cpp
+ *
+ * Copyright (C) 2023 Volodymyr Atamanenko
+ * Copyright (C) 2026 Ellie J Turner
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
+ */
+
 #include "FalsoNDK_Utils.h"
 
 #include <sys/time.h>

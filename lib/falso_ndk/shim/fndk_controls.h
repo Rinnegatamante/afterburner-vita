@@ -1,10 +1,11 @@
 /*
- * reimpl/controls.h
+ * shim/fndk_controls.h
  *
  * Copyright (C) 2022 Volodymyr Atamanenko
+ * Copyright (C) 2026 Ellie J Turner
  *
- * This software may be modified and distributed under the terms
- * of the MIT license. See the LICENSE file for details.
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
  */
 
 #pragma once
@@ -29,6 +30,11 @@ typedef struct {
 /* Override these symbols to use custom button bindings. */
 extern ButtonMapping fndk_button_mapping[];
 extern int fndk_button_mapping_count;
+
+/* Override to change the AInputEvent source reported for button key events
+ * (defaults to AINPUT_SOURCE_GAMEPAD). Some games expect AINPUT_SOURCE_KEYBOARD
+ * and others. */
+extern int fndk_button_event_source;
 
 void fndk_controls_init(AInputQueue * queue);
 int fndk_controls_poll(SceSize args, void * argp);

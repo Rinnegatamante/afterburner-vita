@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <psp2/kernel/threadmgr.h>
 #include <cstring>
+#include <deque>
 #include <map>
 #include <vector>
 #include <algorithm>
@@ -41,7 +42,7 @@ typedef struct sensorEventQueue {
     std::vector<ALooper*> * mAppLoopers;
     std::vector<ASensor*> * mSensors;
     SceKernelLwMutexWork mLock;
-    std::vector<ASensorEvent> * mPendingEvents;
+    std::deque<ASensorEvent> * mPendingEvents;
 } sensorEventQueue;
 
 const char * asensor_type_str(int t) {
@@ -201,7 +202,7 @@ ASensorEventQueue* ASensorManager_createEventQueue(ASensorManager* manager,
         auto * seq = (sensorEventQueue *) malloc(sizeof(sensorEventQueue));
         seq->mDispatchFd = fndk_eventfd(0, FNDK_EFD_NONBLOCK | FNDK_EFD_SEMAPHORE);
         seq->mAppLoopers = new std::vector<ALooper *>;
-        seq->mPendingEvents = new std::vector<ASensorEvent>;
+        seq->mPendingEvents = new std::deque<ASensorEvent>;
         seq->mSensors = new std::vector<ASensor *>;
 
         if (seq->mDispatchFd < 0) {
@@ -275,9 +276,9 @@ ssize_t ASensorEventQueue_getEvents(ASensorEventQueue* queue, ASensorEvent* even
 
     size_t copy = std::min(count, q->mPendingEvents->size());
     for (size_t i = 0; i < copy; ++i) {
-        events[i] = q->mPendingEvents->at(i);
+        events[i] = q->mPendingEvents->front();
+        q->mPendingEvents->pop_front();
     }
-    q->mPendingEvents->erase(q->mPendingEvents->begin(), q->mPendingEvents->begin() + copy);
 
     if (q->mPendingEvents->empty()) {
         uint64_t byteread;

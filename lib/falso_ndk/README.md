@@ -127,6 +127,16 @@ float L_INNER_DEADZONE = 0.15f;
 float R_INNER_DEADZONE = 0.15f;
 ```
 
+Button key events are reported with `AINPUT_SOURCE_GAMEPAD` by default. If a
+game expects buttons to come from `AINPUT_SOURCE_KEYBOARD` or others instead,
+override `fndk_button_event_source`:
+
+```c
+#include <falso_ndk/FalsoNDK.h>
+
+int fndk_button_event_source = AINPUT_SOURCE_KEYBOARD;
+```
+
 You can also override the default logging function:
 
 ```c

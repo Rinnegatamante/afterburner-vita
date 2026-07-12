@@ -1,5 +1,14 @@
-#ifndef FALSONDK_UTILS_H
-#define FALSONDK_UTILS_H
+/*
+ * FalsoNDK_Utils.h
+ *
+ * Copyright (C) 2023 Volodymyr Atamanenko
+ * Copyright (C) 2026 Ellie J Turner
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * See the LICENSE file for details.
+ */
+
+#pragma once
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -40,5 +49,3 @@ void ALOGD(const char * fmt, ...);
 #ifdef __cplusplus
 };
 #endif
-
-#endif // FALSONDK_UTILS_H

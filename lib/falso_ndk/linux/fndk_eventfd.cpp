@@ -19,10 +19,14 @@ typedef struct eventfd_internal {
 
 static eventfd_internal eventfd_pool[EVENTFD_MAX];
 static SceKernelLwMutexWork eventfd_pool_mutex{};
+static SceKernelLwMutexWork eventfd_notify_mutex{};
+static SceKernelLwCondWork  eventfd_notify_cond{};
 
 __attribute__((constructor))
 static void eventfd_pool_init() {
     sceKernelCreateLwMutex(&eventfd_pool_mutex, "eventfd_pool_mutex", 0, 0, NULL);
+    sceKernelCreateLwMutex(&eventfd_notify_mutex, "eventfd_notify_mutex", 0, 0, NULL);
+    sceKernelCreateLwCond(&eventfd_notify_cond, "eventfd_notify_cond", 0, &eventfd_notify_mutex, NULL);
 }
 
 int fndk_eventfd(unsigned int initval, int flags) {
@@ -197,7 +201,21 @@ ssize_t fndk_eventfd_write(int fd, const void *buf, size_t count) {
 
     efd->value += val;
     sceKernelUnlockLwMutex(&eventfd_pool_mutex, 1);
+    fndk_eventfd_notify();
     return 8;
+}
+
+void fndk_eventfd_notify() {
+    sceKernelLockLwMutex(&eventfd_notify_mutex, 1, NULL);
+    sceKernelSignalLwCond(&eventfd_notify_cond);
+    sceKernelUnlockLwMutex(&eventfd_notify_mutex, 1);
+}
+
+void fndk_eventfd_wait_for_activity(unsigned int timeout_us) {
+    sceKernelLockLwMutex(&eventfd_notify_mutex, 1, NULL);
+    SceUInt32 t = timeout_us;
+    sceKernelWaitLwCond(&eventfd_notify_cond, &t);
+    sceKernelUnlockLwMutex(&eventfd_notify_mutex, 1);
 }
 
 void fndk_eventfd_status(int fd, bool * is_readable, bool * is_writeable) {

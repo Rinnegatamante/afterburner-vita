@@ -21,6 +21,9 @@ ssize_t fndk_eventfd_read(int fd, void *buf, size_t count);
 ssize_t fndk_eventfd_write(int fd, const void *buf, size_t count);
 void fndk_eventfd_status(int fd, bool *is_readable, bool *is_writeable);
 
+void fndk_eventfd_notify();
+void fndk_eventfd_wait_for_activity(unsigned int timeout_us);
+
 #ifdef __cplusplus
 };
 #endif
