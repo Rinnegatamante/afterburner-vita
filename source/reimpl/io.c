@@ -13,12 +13,12 @@
 
 #include "reimpl/io.h"
 
+#include <vitasdk.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/unistd.h>
 #include <stdlib.h>
 #include <dirent.h>
-#include <psp2/kernel/threadmgr.h>
 
 #ifdef USE_SCELIBC_IO
 #include <libc_bridge/libc_bridge.h>
@@ -65,10 +65,10 @@ FILE *fopen_soloader(char *fname, char *mode) {
 int mkdir_soloader(const char *path, mode_t mode) {
 	path = patch_fname(path);
 	
-	int res = mkdir(path, mode);
-	logv_debug("[io] stat(%s): %i", path, res);
+	int res = sceIoMkdir(path, 0777);
+	logv_debug("[io] mkdir(%s): %i", path, res);
 	
-	return res;
+	return 0;
 }
 
 int open_soloader(char *_fname, int flags) {
@@ -130,14 +130,21 @@ DIR* opendir_soloader(char* _pathname) {
 	_pathname = patch_fname(_pathname);
 	
     DIR* ret = opendir(_pathname);
-    logv_debug("[io] opendir(\"%s\"): 0x%x", _pathname, ret);
+    logv_debug("[io] opendir(\"%s\"): 0x%x from %p", _pathname, ret, __builtin_return_address(0));
     return ret;
 }
 
-struct dirent * readdir_soloader(DIR * dir) {
+struct dirent64_bionic * readdir_soloader(DIR * dir) {
+	static struct dirent64_bionic dirent_tmp;
     struct dirent* ret = readdir(dir);
     log_debug("[io] readdir()");
-    return ret;
+    if (ret) {
+        dirent64_bionic* entry_tmp = dirent_newlib_to_dirent_bionic(ret);
+        memcpy(&dirent_tmp, entry_tmp, sizeof(dirent64_bionic));
+        free(entry_tmp);
+        return &dirent_tmp;
+    }
+    return NULL;
 }
 
 int readdir_r_soloader(DIR *dirp, dirent64_bionic *entry, dirent64_bionic **result) {
