@@ -9,6 +9,12 @@ By doing so, it's basically as if we emulate a minimalist Android environment in
 
 ## Changelog
 
+### v.1.1
+
+- Updated to latest FalsoNDK.
+- Fixed a bug causing the game to get stuck on the vitaGL splashscreen under certain circumstances.
+- Added a workaround that solves several crash issues when interacting with some touch menus.
+
 ### v.1.0
 
 - Initial release.
