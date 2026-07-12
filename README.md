@@ -1,4 +1,4 @@
-# Afterbuner Climax Vita
+# After Burner Climax Vita
 
 <p align="center"><img src="./extras/screenshots/game1.png"></p>
 
