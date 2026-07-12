@@ -37,6 +37,26 @@ int (*deviceAdded)();
 
 extern SceKernelLwMutexWork fmod_mutex;
 
+so_hook joy_update;
+void (*Joypad_Finalize)(uint32_t *this);
+void (*Joypad_Destructor)(uint32_t *this);
+void (*Joypad_Constructor)(uint32_t *this);
+void (*Joypad_Initialize)(uint32_t *this, int unk);
+
+void Joypad_Update(uint32_t *this, int unk) {
+	if (!this[248]) {
+		sceClibPrintf("Resetting broken Joypad struct\n");
+		Joypad_Finalize(this);
+		Joypad_Destructor(this);
+		Joypad_Constructor(this);
+		Joypad_Initialize(this, 0);
+		Joypad_Update(this, unk);
+		return;
+	}
+	
+	SO_CONTINUE(int, joy_update, this, unk);
+}
+
 void so_patch(void) {
 	sceKernelCreateLwMutex(&fmod_mutex, "FMOD mutex", 0, 0, NULL);
 	
@@ -61,6 +81,13 @@ void so_patch(void) {
 	hook_addr(so_symbol(&so_mod, "_ZN24ABC_INPUT_VIRTUAL_BUTTON13RenderBButtonEv"), ret0);
 	uintptr_t x_button_addr = (uintptr_t)so_symbol(&so_mod, "_ZN24ABC_INPUT_VIRTUAL_BUTTON13RenderXButtonEv") + 0x105;
 	*(uint32_t *)x_button_addr = 0xBF00BF00; // nop, nop
+	
+	// For some reason the INPUT_JOYPAD struct gets corrupted sometimes when doing touch presses, so we detect when this happen and reset the struct into a sane state
+	joy_update = hook_addr(so_symbol(&so_mod, "_ZN12INPUT_JOYPAD6UpdateERK14PRIMITIVE_TIME"), Joypad_Update);
+	Joypad_Finalize = so_symbol(&so_mod, "_ZN12INPUT_JOYPAD8FinalizeEv");
+	Joypad_Destructor = so_symbol(&so_mod, "_ZN12INPUT_JOYPADD2Ev");
+	Joypad_Constructor = so_symbol(&so_mod, "_ZN12INPUT_JOYPADC2Ev");
+	Joypad_Initialize =  so_symbol(&so_mod, "_ZN12INPUT_JOYPAD10InitializeEi");
 	
 	// Required for flagging for gamepad connection in checkGameController JNI method
 	deviceAdded = (void *)so_symbol(&so_mod, "Java_com_sega_afterburnerclimax_AfterBurnerClimax_deviceAdded");
