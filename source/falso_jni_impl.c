@@ -72,6 +72,7 @@ void saveValueInt(jmethodID id, va_list args) {
 	char fname[256];
 	normalize_path(key)
 	sprintf(fname, "ux0:data/afterburner/i_%s.bin", key);
+	jni->ReleaseStringUTFChars(&jni, _key, key);
 	FILE *f = fopen(fname, "wb");
 	fwrite(&val, 1, sizeof(val), f);
 	fclose(f);
@@ -84,6 +85,7 @@ void saveValueBool(jmethodID id, va_list args) {
 	char fname[256];
 	normalize_path(key)
 	sprintf(fname, "ux0:data/afterburner/b_%s.bin", key);
+	jni->ReleaseStringUTFChars(&jni, _key, key);
 	FILE *f = fopen(fname, "wb");
 	fwrite(&val, 1, sizeof(val), f);
 	fclose(f);
@@ -96,6 +98,7 @@ void saveValueLong(jmethodID id, va_list args) {
 	char fname[256];
 	normalize_path(key)
 	sprintf(fname, "ux0:data/afterburner/l_%s.bin", key);
+	jni->ReleaseStringUTFChars(&jni, _key, key);
 	FILE *f = fopen(fname, "wb");
 	fwrite(&val, 1, sizeof(val), f);
 	fclose(f);
@@ -108,6 +111,7 @@ void saveValueFloat(jmethodID id, va_list args) {
 	char fname[256];
 	normalize_path(key)
 	sprintf(fname, "ux0:data/afterburner/f_%s.bin", key);
+	jni->ReleaseStringUTFChars(&jni, _key, key);
 	FILE *f = fopen(fname, "wb");
 	fwrite(&val, 1, sizeof(val), f);
 	fclose(f);
@@ -121,9 +125,11 @@ void saveValueString(jmethodID id, va_list args) {
 	char fname[256];
 	normalize_path(key)
 	sprintf(fname, "ux0:data/afterburner/s_%s.bin", key);
+	jni->ReleaseStringUTFChars(&jni, _key, key);
 	FILE *f = fopen(fname, "wb");
 	fwrite(val, 1, strlen(val), f);
 	fclose(f);
+	jni->ReleaseStringUTFChars(&jni, _val, val);
 }
 
 jboolean getValueDataBool(jmethodID id, va_list args) {
@@ -133,6 +139,7 @@ jboolean getValueDataBool(jmethodID id, va_list args) {
 	char fname[256];
 	normalize_path(key)
 	sprintf(fname, "ux0:data/afterburner/b_%s.bin", key);
+	jni->ReleaseStringUTFChars(&jni, _key, key);
 	FILE *f = fopen(fname, "rb");
 	if (f) {
 		jboolean ret;
@@ -152,6 +159,7 @@ jint getValueDataInt(jmethodID id, va_list args) {
 	char fname[256];
 	normalize_path(key)
 	sprintf(fname, "ux0:data/afterburner/i_%s.bin", key);
+	jni->ReleaseStringUTFChars(&jni, _key, key);
 	FILE *f = fopen(fname, "rb");
 	if (f) {
 		jint ret;
@@ -171,6 +179,7 @@ jlong getValueDataLong(jmethodID id, va_list args) {
 	char fname[256];
 	normalize_path(key)
 	sprintf(fname, "ux0:data/afterburner/l_%s.bin", key);
+	jni->ReleaseStringUTFChars(&jni, _key, key);
 	FILE *f = fopen(fname, "rb");
 	if (f) {
 		jlong ret;
@@ -188,6 +197,7 @@ jfloat getValueDataFloat(jmethodID id, va_list args) {
 	char fname[256];
 	normalize_path(key)
 	sprintf(fname, "ux0:data/afterburner/f_%s.bin", key);
+	jni->ReleaseStringUTFChars(&jni, _key, key);
 	FILE *f = fopen(fname, "rb");
 	if (f) {
 		jfloat ret;
@@ -205,6 +215,7 @@ jstring getValueDataString(jmethodID id, va_list args) {
 	char fname[256];
 	normalize_path(key)
 	sprintf(fname, "ux0:data/afterburner/s_%s.bin", key);
+	jni->ReleaseStringUTFChars(&jni, _key, key);
 	FILE *f = fopen(fname, "rb");
 	if (f) {
 		fseek(f, 0, SEEK_END);
