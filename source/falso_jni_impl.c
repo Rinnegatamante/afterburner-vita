@@ -137,16 +137,17 @@ jboolean getValueDataBool(jmethodID id, va_list args) {
 	char fname[256];
 	normalize_path(key)
 	sprintf(fname, "ux0:data/afterburner/b_%s.bin", key);
-	jni->ReleaseStringUTFChars(&jni, _key, key);
 	FILE *f = fopen(fname, "rb");
 	if (f) {
+		jni->ReleaseStringUTFChars(&jni, _key, key);
 		jboolean ret;
 		fread(&ret, 1, sizeof(ret), f);
 		fclose(f);
 		return ret;
 	}
 	if (strstr(key, "age") || strstr(key, "consent") || strstr(key, "gdpr") || strstr(key, "coppa") || strstr(key, "legal"))
-		return JNI_TRUE;
+		val = JNI_TRUE;
+	jni->ReleaseStringUTFChars(&jni, _key, key);
 	return val;
 }
 
@@ -157,16 +158,17 @@ jint getValueDataInt(jmethodID id, va_list args) {
 	char fname[256];
 	normalize_path(key)
 	sprintf(fname, "ux0:data/afterburner/i_%s.bin", key);
-	jni->ReleaseStringUTFChars(&jni, _key, key);
 	FILE *f = fopen(fname, "rb");
 	if (f) {
+		jni->ReleaseStringUTFChars(&jni, _key, key);
 		jint ret;
 		fread(&ret, 1, sizeof(ret), f);
 		fclose(f);
 		return ret;
 	}
 	if (strstr(key, "age") || strstr(key, "consent") || strstr(key, "gdpr") || strstr(key, "coppa") || strstr(key, "legal"))
-		return 1;
+		val = 1;
+	jni->ReleaseStringUTFChars(&jni, _key, key);
 	return val;
 }
 
@@ -238,6 +240,7 @@ void showMessageBox(jmethodID id, va_list args) {
 	jstring msg = va_arg(args, jstring);
 	const char *cmsg = jni->GetStringUTFChars(&jni, msg, NULL);
 	sceClibPrintf("showMessageBox %s\n", cmsg);
+	jni->ReleaseStringUTFChars(&jni, msg, cmsg);
 }
 
 extern int (*deviceAdded)();
