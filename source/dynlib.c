@@ -263,7 +263,7 @@ void glCompressedTexImage2D_hook(GLenum target, GLint level, GLenum internalform
 #define FMOD_STUDIO_EVENT_CALLBACK_STOPPED 0x00000002
 SceKernelLwMutexWork fmod_mutex;
 #define MAX_INSTANCES_NUM (1024)
-void* instances_to_release[MAX_INSTANCES_NUM];
+void *instances_to_release[MAX_INSTANCES_NUM];
 int instances_num = 0;
 extern int _ZN4FMOD6Studio13EventInstance7releaseEv(void *thiz);
 extern int _ZN4FMOD6Studio13EventInstance11setCallbackEPF11FMOD_RESULTjP25FMOD_STUDIO_EVENTINSTANCEPvEj(void *thiz, void *callback, unsigned int callbackmask);
@@ -286,7 +286,8 @@ int FMOD_Studio_System_update_cpp(void *thiz) {
 	
 	// EventInstance::release has an internal mutex that can result in mutual exclusion deadlock if called inside the fmod_mutex lock
 	sceKernelLockLwMutex(&fmod_mutex, 1, NULL);
-	sceClibMemcpy(to_release, instances_to_release, 4 * instances_num);
+	if (instances_num)
+		sceClibMemcpy(to_release, instances_to_release, 4 * instances_num);
 	to_release_num = instances_num;
 	instances_num = 0;
 	sceKernelUnlockLwMutex(&fmod_mutex, 1);
