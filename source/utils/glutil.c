@@ -51,7 +51,7 @@ void gl_preload() {
 }
 
 void gl_init() {
-    vglInitWithCustomThreshold(0, 960, 544, 6 * 1024 * 1024, 0, 32 * 1024 * 1024, 0, SCE_GXM_MULTISAMPLE_4X);
+    vglInitWithCustomThreshold(0, 960, 544, 12 * 1024 * 1024, 0, 32 * 1024 * 1024, 0, SCE_GXM_MULTISAMPLE_4X);
 }
 
 void gl_swap() {

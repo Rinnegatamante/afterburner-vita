@@ -176,12 +176,12 @@ int pthread_create_soloader(pthread_t *thread, const pthread_attr_t_bionic *attr
     if (!attr) {
         pthread_attr_t a;
         pthread_attr_init(&a);
-        pthread_attr_setstacksize(&a, 512 * 1024);
+        pthread_attr_setstacksize(&a, 1024 * 1024);
         ret = pthread_create(thread, &a, start, param);
         pthread_attr_destroy(&a);
     } else{
         _attr_t_static_init((pthread_attr_t_bionic *) attr);
-        pthread_attr_setstacksize(attr->real_ptr, 512 * 1024);
+        pthread_attr_setstacksize(attr->real_ptr, 1024 * 1024);
         ret = pthread_create(thread, attr->real_ptr, start, param);
     }
 
