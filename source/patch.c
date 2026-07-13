@@ -66,6 +66,9 @@ void so_patch(void) {
 	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension16isConsentCountryEv"), ret1);
 	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension15haveUserConsentEv"), ret1);
 	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension16checkConsentGDPREv"), ret1);
+
+	// Remove ads banner removal
+	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension27Android_stateUserRemovedAdsEv"), ret1);
 	
 	// Nuke some unused functions
 	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension10trackEventENSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE"), ret0);
