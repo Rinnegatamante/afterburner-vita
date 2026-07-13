@@ -52,8 +52,6 @@ NameToMethodID nameToMethodId[] = {
 	{ 34, "callBackGDPRState", METHOD_TYPE_VOID },
 	{ 35, "playIntroVideo", METHOD_TYPE_VOID },
 	{ 36, "showMessageBox", METHOD_TYPE_VOID },
-	{ 37, "getClassLoader", METHOD_TYPE_OBJECT },
-	{ 38, "loadClass", METHOD_TYPE_OBJECT },
 	{ 39, "getValueDataBool", METHOD_TYPE_BOOLEAN },
 	{ 40, "checkGameController", METHOD_TYPE_VOID },
 };
@@ -430,8 +428,6 @@ MethodsObject methodsObject[] = {
 	{ 14, emptyString }, // getDeviceID
 	{ 15, emptyString }, // getPriceStringIAP
 	{ 16, getMainPath }, // getApkPath
-	{ 37, dummy_alloc }, // getClassLoader
-	{ 38, dummy_alloc }, // loadClass
 };
 
 MethodsVoid methodsVoid[] = {
@@ -454,12 +450,9 @@ MethodsVoid methodsVoid[] = {
 // https://developer.android.com/reference/android/content/Context.html#WINDOW_SERVICE
 char WINDOW_SERVICE[] = "window";
 
-char DUMMY_OBJ[16];
-
 NameToFieldID nameToFieldId[] = {
 	{ 0, "WINDOW_SERVICE", FIELD_TYPE_OBJECT }, 
 	{ 1, "SDK_INT", FIELD_TYPE_INT },
-	{ 2, "mAgeMgr", FIELD_TYPE_OBJECT },
 };
 
 FieldsBoolean fieldsBoolean[] = {};
@@ -472,7 +465,6 @@ FieldsInt fieldsInt[] = {
 };
 FieldsObject fieldsObject[] = {
 	{ 0, WINDOW_SERVICE },
-	{ 2, DUMMY_OBJ }, // mAgeMgr
 };
 FieldsLong fieldsLong[] = {};
 FieldsShort fieldsShort[] = {};

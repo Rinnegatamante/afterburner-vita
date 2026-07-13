@@ -1355,10 +1355,7 @@ const char* GetStringUTFChars(JNIEnv* env, jstring string, jboolean* isCopy) {
         return NULL;
     }
 
-    size_t copy_len = strlen(str->utf8->array);
-	if (copy_len > str->utf16->len) copy_len = str->utf16->len;
-    memcpy(ret, str->utf8->array, copy_len);
-	ret[copy_len] = 0;
+    memcpy(ret, str->utf8->array, str->utf8->len);
 
     fjni_logv_dbg("[JNI] GetStringUTFChars(env, \"%s\", *isCopy)", (char *)str->utf8->array);
 

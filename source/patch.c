@@ -31,8 +31,6 @@ extern so_module so_mod;
 int ret0() { return 0; }
 int ret1() { return 1; }
 
-void *dummy_alloc() { return malloc(0x20); }
-
 int (*deviceAdded)();
 
 extern SceKernelLwMutexWork fmod_mutex;
@@ -59,9 +57,6 @@ void Joypad_Update(uint32_t *this, int unk) {
 
 void so_patch(void) {
 	sceKernelCreateLwMutex(&fmod_mutex, "FMOD mutex", 0, 0, NULL);
-	
-	// Prevent crashes on NULL objects references
-	hook_addr(so_symbol(&so_mod, "_ZN37PLATFORM_JAVA_NATIVE_ACTIVITY_MANAGER12GetJavaClassERK18PRIMITIVE_SUB_TEXT"), dummy_alloc);
 	
 	// Skip age consent checks
 	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension17haveRemoveAgeGateEv"), ret1);
