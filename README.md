@@ -76,7 +76,7 @@ Additionally, you'll need these libraries to be compiled as well with `-mfloat-a
 - [vitaGL](https://github.com/Rinnegatamante/vitaGL)
 
   - ````bash
-    make NO_DEBUG=1 SOFTFP_ABI=1 DEPTH_STENCIL_HACK=1 CIRCULAR_POOL_SPEEDHACK=1 HAVE_SHADER_CACHE=1 INDICES_SPEEDHACK=1 HAVE_CUSTOM_HEAP=1 SINGLE_THREADED_GC=1 ENABLE_LEGACY_PIPELINE=1 install
+    make NO_DEBUG=1 SOFTFP_ABI=1 DEPTH_STENCIL_HACK=1 CIRCULAR_POOL_SPEEDHACK=1 HAVE_SHADER_CACHE=1 INDICES_SPEEDHACK=1 ENABLE_LEGACY_PIPELINE=1 install
     ````
 
 After all these requirements are met, you can compile the loader with the following commands:

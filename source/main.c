@@ -30,6 +30,8 @@
 #include <vitasdk.h>
 #include <stdio.h>
 
+extern const int SDK_INT;
+
 int _newlib_heap_size_user = 200 * 1024 * 1024;
 int sceLibcHeapSize = 56 * 1024 * 1024;
 
@@ -74,7 +76,7 @@ void *real_main(void *argv) {
 	activity->clazz           = (jclass)0x42424242;
 	activity->internalDataPath = DATA_PATH "assets/";
 	activity->externalDataPath = DATA_PATH "assets/";
-	activity->sdkVersion      = 14;
+	activity->sdkVersion      = SDK_INT;
 	activity->instance        = NULL;
 	log_info("Created NativeActivity object");
 
