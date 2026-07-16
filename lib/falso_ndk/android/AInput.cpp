@@ -268,6 +268,7 @@ float AMotionEvent_getAxisValue(const AInputEvent* motion_event,
 int32_t axis, size_t pointer_index) {
     if (!motion_event) return 0;
     auto * e = reinterpret_cast<const inputEvent *>(motion_event);
+    if (pointer_index >= 10) pointer_index = 9;
     switch (axis) {
         case AMOTION_EVENT_AXIS_X:
             return e->motion_x[pointer_index];

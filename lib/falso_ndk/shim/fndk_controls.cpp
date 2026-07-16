@@ -102,12 +102,32 @@ void removeById(inputEvent * e, int id) {
     }
 }
 
-static int curr_max_id = 0;
-static int id_start = 0;
+// Vita touch ids just keep incrementing from 0 to 127 and wrap but Android
+// reuses the lowest free id and games might index arrays by it. So map every
+// contact to a small "slot" and report that as the pointer id instead.
+#define MAX_POINTERS 10
+static int slot_hw_id[MAX_POINTERS] = {
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+};
+
+static int slotByHwId(int hw_id) {
+    for (int i = 0; i < MAX_POINTERS; ++i) {
+        if (slot_hw_id[i] == hw_id) return i;
+    }
+    return -1;
+}
+
+static int slotAlloc(int hw_id) {
+    for (int i = 0; i < MAX_POINTERS; ++i) {
+        if (slot_hw_id[i] == -1) {
+            slot_hw_id[i] = hw_id;
+            return i;
+        }
+    }
+    return -1;
+}
 
 void pollTouch() {
-    int finger_id = 0;
-
     memcpy(&touch_old, &touch, sizeof(touch_old));
 
     int numPointersMoved = 0;
@@ -128,12 +148,12 @@ void pollTouch() {
             float x = ((float)touch.report[i].x * 960.f / 1920.0f);
             float y = ((float)touch.report[i].y * 544.f / 1088.0f);
 
-            if (touch.report[i].id > curr_max_id)
-                curr_max_id = touch.report[i].id;
-            finger_id = touch.report[i].id - id_start;
-
-            // Send touch down event only if finger wasn't already down before
+            // Send touch down event only if finger wasn't already down before.
+            // slotAlloc failing also keeps numPointersDown within ev's arrays.
             if (!finger_down) {
+                int finger_id = slotAlloc(touch.report[i].id);
+                if (finger_id == -1) continue;
+
                 ev.source = AINPUT_SOURCE_TOUCHSCREEN;
                 ev.motion_ptrcount = numPointersDown + 1;
                 ev.motion_x[numPointersDown] = x;
@@ -155,10 +175,12 @@ void pollTouch() {
                 AInputEvent* aie = AInputEvent_create(&ev_ptrdown);
                 AInputQueue_enqueueEvent(inputQueue, aie);
             }
-            // Otherwise, send touch move
+            // Otherwise, send touch move, but only if it actually moved,
+            // a held finger shouldn't spam MOVE every poll
             else {
-                int idx = getIdxById(&ev, finger_id);
-                if (idx != -1) {
+                int finger_id = slotByHwId(touch.report[i].id);
+                int idx = (finger_id == -1) ? -1 : getIdxById(&ev, finger_id);
+                if (idx != -1 && (ev.motion_x[idx] != x || ev.motion_y[idx] != y)) {
                     ev.motion_x[idx] = x;
                     ev.motion_y[idx] = y;
                     numPointersMoved++;
@@ -190,7 +212,10 @@ void pollTouch() {
             if (finger_up == 1) {
                 float x = ((float)touch_old.report[i].x * 960.f / 1920.0f);
                 float y = ((float)touch_old.report[i].y * 544.f / 1088.0f);
-                finger_id = touch_old.report[i].id - id_start;
+
+                int finger_id = slotByHwId(touch_old.report[i].id);
+                if (finger_id == -1) continue;
+                slot_hw_id[finger_id] = -1;
 
                 int idx = getIdxById(&ev, finger_id);
                 if (idx != -1) {
@@ -216,11 +241,14 @@ void pollTouch() {
     }
 
     if (touch.reportNum == 0) {
-        id_start = curr_max_id + 1;
-        if (id_start < 0 || id_start > 127) {
-            curr_max_id = 0;
-            id_start = 0;
+        // nothing is touching the screen, so drop any stale state
+        // left over from a missed lift
+        if (numPointersDown != 0 || ev.motion_ptrcount != 0) {
+            numPointersDown = 0;
+            memset(&ev, 0, sizeof(ev));
         }
+        for (int i = 0; i < MAX_POINTERS; ++i)
+            slot_hw_id[i] = -1;
     }
 }
 
