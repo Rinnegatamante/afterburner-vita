@@ -93,7 +93,12 @@ void video_close() {
 }
 
 uint8_t video_finished() {
-	return player_state == PLAYER_INACTIVE;
+	uint8_t ret = player_state == PLAYER_INACTIVE;
+	if (ret) {
+		glDeleteTextures(5, movie_frame);
+		sceSysmoduleUnloadModule(SCE_SYSMODULE_AVPLAYER);
+	}
+	return ret;
 }
 
 void video_open(const char *path) {
@@ -111,12 +116,11 @@ void video_open(const char *path) {
 			glBindTexture(GL_TEXTURE_2D, movie_frame[i]);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 8, 8, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 			movie_tex[i] = vglGetGxmTexture(GL_TEXTURE_2D);
-			vglFree(vglGetTexDataPointer(GL_TEXTURE_2D));
 		}
 	}
 	
 	SceAvPlayerInitData playerInit;
-	memset(&playerInit, 0, sizeof(SceAvPlayerInitData));
+	sceClibMemset(&playerInit, 0, sizeof(SceAvPlayerInitData));
 
 	playerInit.memoryReplacement.allocate = mem_alloc;
 	playerInit.memoryReplacement.deallocate = mem_free;
