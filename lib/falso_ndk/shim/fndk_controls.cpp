@@ -11,21 +11,17 @@
 #include "shim/fndk_controls.h"
 
 #include <psp2/kernel/threadmgr.h>
-#include <stdio.h>
+#include <cstdio>
 #include <cstring>
-#include <psp2/kernel/clib.h>
 
 #include "android/keycodes.h"
 #include "android/AInput.h"
 
 extern "C" {
-    float L_INNER_DEADZONE __attribute__((weak)) = 0.20f;
-    float R_INNER_DEADZONE __attribute__((weak)) = 0.20f;
+    float L_INNER_DEADZONE __attribute__((weak)) = 0.16f;
+    float R_INNER_DEADZONE __attribute__((weak)) = 0.16f;
     int fndk_button_event_source __attribute__((weak)) = AINPUT_SOURCE_GAMEPAD;
 }
-
-#define L_OUTER_DEADZONE 0.99f
-#define R_OUTER_DEADZONE 0.99f
 
 #define BACK_TOUCH_MARGIN 100
 
@@ -35,16 +31,22 @@ SceTouchPanelInfo panelInfoBack;
 void pollTouch();
 void pollPad();
 
-float lerp(float x1, float y1, float x3, float y3, float x2) {
-    return ((x2-x1)*(y3-y1) / (x3-x1)) + y1;
-}
+void coord_normalize(float * x, float * y, float deadzone) {
+    float magnitude = sqrtf((*x * *x) + (*y * *y));
+    if (magnitude < deadzone) {
+        *x = 0;
+        *y = 0;
+        return;
+    }
 
-float coord_normalize(float val, float deadzone_min, float deadzone_max) {
-    float sign = (val < 0) ? -1.0f : 1.0f;
+    // normalize
+    *x = *x / magnitude;
+    *y = *y / magnitude;
 
-    if (fabsf(val) < deadzone_min) return 0.f;
-    if (fabsf(val) > deadzone_max) return 1.0f*sign;
-    return lerp(0.f, deadzone_min * sign, 1.0f*sign, deadzone_max*sign, val);
+    float clamped = magnitude > 1.0f ? 1.0f : magnitude;
+    float multiplier = ((clamped - deadzone) / (1 - deadzone));
+    *x = *x * multiplier;
+    *y = *y * multiplier;
 }
 
 void fndk_controls_init(AInputQueue * queue) {
@@ -62,7 +64,7 @@ void fndk_controls_init(AInputQueue * queue) {
 }
 
 int fndk_controls_poll(SceSize args, void * argp) {
-    while (1) {
+    while (true) {
         pollPad();
         pollTouch();
         sceKernelDelayThread(16666);
@@ -241,8 +243,7 @@ void pollTouch() {
     }
 
     if (touch.reportNum == 0) {
-        // nothing is touching the screen, so drop any stale state
-        // left over from a missed lift
+        // nothing is touching the screen => drop any stale state left from a missed lift
         if (numPointersDown != 0 || ev.motion_ptrcount != 0) {
             numPointersDown = 0;
             memset(&ev, 0, sizeof(ev));
@@ -273,7 +274,7 @@ extern "C" {
 }
 
 uint32_t old_buttons = 0, current_buttons = 0, pressed_buttons = 0, released_buttons = 0;
-float lx = 0, ly = 0, rx = 0, ry = 0, lastLx = 0, lastLy = 0, lastRx = 0, lastRy = 0;
+float lx = 0, ly = 0, rx = 0, ry = 0;
 
 inputEvent stickInputEvent;
 int sticksDown = 0;
@@ -281,7 +282,10 @@ float x_old = 0.0f, y_old = 0.0f, z_old = 0.0f, rz_old = 0.0f, hat_x_old = 0.0f,
 bool ltPressed_old = false, rtPressed_old = false;
 
 void sendJoyEvent(float x, float y, float z, float rz, float hat_x, float hat_y, bool ltPressed, bool rtPressed) {
-    if (x != x_old || y != y_old || z != z_old || rz != rz_old || hat_x != hat_x_old || hat_y != hat_y_old || ltPressed != ltPressed_old || rtPressed != rtPressed_old) {
+    if (x != x_old || y != y_old || z != z_old || rz != rz_old
+        || hat_x != hat_x_old || hat_y != hat_y_old
+        || ltPressed != ltPressed_old || rtPressed != rtPressed_old)
+    {
         stickInputEvent.source = AINPUT_SOURCE_JOYSTICK;
         stickInputEvent.motion_ptrcount = sticksDown + 1;
         stickInputEvent.motion_x[0] = x;
@@ -358,18 +362,13 @@ void pollPad() {
         }
     }
 
-    lastLx = lx;
-    lastLy = ly;
-    lastRx = rx;
-    lastRy = ry;
+    lx = ((float)pad.lx - 128.0f) / 128.0f;
+    ly = ((float)pad.ly - 128.0f) / 128.0f;
+    rx = ((float)pad.rx - 128.0f) / 128.0f;
+    ry = ((float)pad.ry - 128.0f) / 128.0f;
 
-    lx = coord_normalize(((float)pad.lx - 128.0f) / 128.0f, L_INNER_DEADZONE, L_OUTER_DEADZONE);
-    ly = coord_normalize(((float)pad.ly - 128.0f) / 128.0f, L_INNER_DEADZONE, L_OUTER_DEADZONE);
-    rx = coord_normalize(((float)pad.rx - 128.0f) / 128.0f, R_INNER_DEADZONE, R_OUTER_DEADZONE);
-    ry = coord_normalize(((float)pad.ry - 128.0f) / 128.0f, R_INNER_DEADZONE, R_OUTER_DEADZONE);
-
-    stickInputEvent.motion_action = AMOTION_EVENT_ACTION_MOVE;
-    stickInputEvent.type = AINPUT_EVENT_TYPE_MOTION;
+    coord_normalize(&lx, &ly, L_INNER_DEADZONE);
+    coord_normalize(&rx, &ry, R_INNER_DEADZONE);
 
     sendJoyEvent(lx, ly, rx, ry, 0, 0, current_buttons & SCE_CTRL_L2, current_buttons & SCE_CTRL_R2);
 }
