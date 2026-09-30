@@ -39,26 +39,26 @@ void so_patch(void) {
 	sceKernelCreateLwMutex(&fmod_mutex, "FMOD mutex", 0, 0, NULL);
 	
 	// Skip age consent checks
-	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension17haveRemoveAgeGateEv"), ret1);
-	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension12isEnoughtAgeEv"), ret1);
-	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension17getGDPRFormFinishEv"), ret1);
-	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension18haveGDPRFormFinishEv"), ret1);
-	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension16isConsentCountryEv"), ret1);
-	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension15haveUserConsentEv"), ret1);
-	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension16checkConsentGDPREv"), ret1);
+	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension17haveRemoveAgeGateEv"), (uintptr_t)ret1);
+	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension12isEnoughtAgeEv"), (uintptr_t)ret1);
+	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension17getGDPRFormFinishEv"), (uintptr_t)ret1);
+	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension18haveGDPRFormFinishEv"), (uintptr_t)ret1);
+	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension16isConsentCountryEv"), (uintptr_t)ret1);
+	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension15haveUserConsentEv"), (uintptr_t)ret1);
+	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension16checkConsentGDPREv"), (uintptr_t)ret1);
 	
-	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension24Android_getInternetStateEv"), ret1);
+	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension24Android_getInternetStateEv"), (uintptr_t)ret1);
 
 	// Remove ads banner removal
-	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension27Android_stateUserRemovedAdsEv"), ret1);
+	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension27Android_stateUserRemovedAdsEv"), (uintptr_t)ret1);
 	
 	// Nuke some unused functions
-	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension10trackEventENSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE"), ret0);
-	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension22Android_trackEventJSONERKNSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEES8_"), ret0);	
+	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension10trackEventENSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE"), (uintptr_t)ret0);
+	hook_addr(so_symbol(&so_mod, "_ZN12F2FExtension22Android_trackEventJSONERKNSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEES8_"), (uintptr_t)ret0);
 
 	// Disable touch inputs rendering
-	hook_addr(so_symbol(&so_mod, "_ZN24ABC_INPUT_VIRTUAL_BUTTON13RenderAButtonEv"), ret0);
-	hook_addr(so_symbol(&so_mod, "_ZN24ABC_INPUT_VIRTUAL_BUTTON13RenderBButtonEv"), ret0);
+	hook_addr(so_symbol(&so_mod, "_ZN24ABC_INPUT_VIRTUAL_BUTTON13RenderAButtonEv"), (uintptr_t)ret0);
+	hook_addr(so_symbol(&so_mod, "_ZN24ABC_INPUT_VIRTUAL_BUTTON13RenderBButtonEv"), (uintptr_t)ret0);
 	uintptr_t x_button_addr = (uintptr_t)so_symbol(&so_mod, "_ZN24ABC_INPUT_VIRTUAL_BUTTON13RenderXButtonEv") + 0x105;
 	*(uint32_t *)x_button_addr = 0xBF00BF00; // nop, nop
 	
