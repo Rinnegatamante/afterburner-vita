@@ -50,6 +50,8 @@
 #include "utils/glutil.h"
 #include "utils/utils.h"
 #include "utils/logger.h"
+#include "utils/dialog.h"
+#include <fmod/fmod_studio.h>
 
 #ifdef USE_SCELIBC_IO
 #include <libc_bridge/libc_bridge.h>
@@ -185,7 +187,7 @@ int AMotionEvent_getMetaState() {
 extern so_module so_mod;
 long unsigned int *__gnu_Unwind_Find_exidx(long unsigned int *PC, int *pcount) {
 	*pcount = so_mod.exidx_size / 8;
-	return so_mod.exidx_base;
+	return (long unsigned int *)so_mod.exidx_base;
 }
 
 int __exidx_end() {
@@ -236,7 +238,7 @@ extern int _ZN4FMOD6Studio13EventInstance5startEv(void *thiz);
 
 int mkdir_soloader(const char *path, mode_t mode);
 
-int FMOD_Studio_System_Create_cpp(void **sys, unsigned int version) {
+int FMOD_Studio_System_Create_cpp(FMOD_STUDIO_SYSTEM **sys, unsigned int version) {
 	sceClibPrintf("FMOD Studio wants %x version\n", version);
 	int ret = FMOD_Studio_System_Create(sys, 0x11013);
 	if (ret) {

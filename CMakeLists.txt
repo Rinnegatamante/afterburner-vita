@@ -11,7 +11,9 @@ set(CMAKE_TOOLCHAIN_FILE "$ENV{VITASDK}/share/vita.toolchain.cmake"
 project(afterburner C CXX)
 
 include("${VITASDK}/share/vita.cmake" REQUIRED)
-
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(sndfile REQUIRED IMPORTED_TARGET sndfile)
+pkg_check_modules(vorbisfile REQUIRED IMPORTED_TARGET vorbisfile)
 # Vita application configuration
 set(VITA_APP_NAME "After Burner Climax")
 set(VITA_TITLEID "AFTBURCLI")
@@ -83,7 +85,11 @@ target_include_directories(${CMAKE_PROJECT_NAME}
 						   PUBLIC ${CMAKE_SOURCE_DIR}/source
 						   )
 
+
 target_link_libraries(${CMAKE_PROJECT_NAME}
+                      -Wl,--start-group
+                      PkgConfig::sndfile
+                      PkgConfig::vorbisfile
 					  FalsoNDK
 					  -Wl,--whole-archive pthread -Wl,--no-whole-archive
 					  fmodpp
@@ -125,6 +131,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 					  ScePower_stub
 					  SceTouch_stub
 					  SceVshBridge_stub
+                      -Wl,--end-group
 					  )
 
 vita_create_self(eboot.bin ${CMAKE_PROJECT_NAME} UNSAFE NOASLR)
